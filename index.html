@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine Instagram Story</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  font-family:Arial,sans-serif;
+  overflow:hidden;
+  background:linear-gradient(135deg,#ff4e88,#ff6fa5,#ff2d55,#ff8fab);
+  background-size:300% 300%;
+  animation:valBg 8s ease infinite;
+}
+@keyframes valBg{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+/* Floating hearts */
+.hearts{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  overflow:hidden;
+}
+.hearts span{
+  position:absolute;
+  color:white;
+  font-size:22px;
+  opacity:0.6;
+  animation:floatHearts linear infinite;
+}
+@keyframes floatHearts{
+  0%{transform:translateY(100vh) scale(0.8); opacity:0;}
+  50%{opacity:1;}
+  100%{transform:translateY(-120vh) scale(1.2); opacity:0;}
+}
+/* Story Container fits phone screen exactly */
+.story-container{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  max-width:420px;
+  max-height:740px;
+  overflow:hidden;
+  border-radius:20px;
+  background:black;
+  box-shadow:0 20px 60px rgba(0,0,0,0.8),
+             0 0 40px rgba(0,0,0,0.6);
+}
+.story-container::before{
+  content:"";
+  position:absolute;
+  inset:-40px;
+  background:radial-gradient(circle,rgba(255,255,255,0.15),transparent 70%);
+  filter:blur(40px);
+  z-index:-1;
+}
+/* Slides */
+.slide{
+  position:absolute;
+  width:100%;
+  height:100%;
+  opacity:0;
+  transition:opacity 0.6s ease-in-out;
+}
+.slide img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.slide::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,0.75),rgba(0,0,0,0.2),rgba(0,0,0,0.6));
+  pointer-events:none;
+}
+.active{opacity:1;}
+/* Progress Bars */
+.progress-bars{
+  position:absolute;
+  top:3vh;
+  left:3vw;
+  right:3vw;
+  display:flex;
+  gap:2vw;
+  z-index:10;
+}
+.progress{
+  flex:1;
+  height:0.5vh;
+  background:rgba(255,255,255,0.3);
+  border-radius:5px;
+  overflow:hidden;
+}
+.progress span{
+  display:block;
+  height:100%;
+  width:0%;
+  background:white;
+}
+/* Tap Areas */
+.tap-left,.tap-right{
+  position:absolute;
+  top:0;
+  width:50%;
+  height:100%;
+  z-index:20;
+}
+.tap-left{left:0;}
+.tap-right{right:0;}
+/* Audio Button */
+.audio-btn{
+  position:absolute;
+  bottom:3vh;
+  right:3vw;
+  background:rgba(0,0,0,0.5);
+  color:white;
+  border:none;
+  padding:1vh 2vw;
+  border-radius:20px;
+  cursor:pointer;
+  font-size:4vw;
+}
+</style>
+</head>
+<body>
+
+<!-- Floating Hearts -->
+<div class="hearts" id="hearts"></div>
+
+<div class="story-container">
+  <!-- Progress Bars -->
+  <div class="progress-bars">
+    <div class="progress"><span></span></div>
+    <div class="progress"><span></span></div>
+    <div class="progress"><span></span></div>
+    <div class="progress"><span></span></div>
+    <div class="progress"><span></span></div>
+    <div class="progress"><span></span></div>
+    <div class="progress"><span></span></div>
+    <div class="progress"><span></span></div>
+    <div class="progress"><span></span></div>
+    <div class="progress"><span></span></div>
+  </div>
+
+  <!-- Slides -->
+  <div class="slide active"><img src="1.JPG"></div>
+  <div class="slide"><img src="2.JPG"></div>
+  <div class="slide"><img src="3.JPG"></div>
+  <div class="slide"><img src="4.JPG"></div>
+  <div class="slide"><img src="5.JPG"></div>
+  <div class="slide"><img src="6.JPG"></div>
+  <div class="slide"><img src="7.JPG"></div>
+  <div class="slide"><img src="8.JPG"></div>
+  <div class="slide"><img src="9.JPG"></div>
+  <div class="slide"><img src="10.JPG"></div>
+
+  <!-- Tap Areas -->
+  <div class="tap-left"></div>
+  <div class="tap-right"></div>
+
+  <!-- Audio Button -->
+  
+  <!-- Audio -->
+  <audio id="music" loop>
+    <source src="Edith Whiskers (Tom Rosenthal) - Home (Lyrics).mp3" type="audio/mp3">
+  </audio>
+</div>
+
+<script>
+/* Story Logic */
+let slides=document.querySelectorAll(".slide");
+let progressBars=document.querySelectorAll(".progress span");
+let current=0;
+let duration=5000;
+let timer;
+let music=document.getElementById("music");
+
+function startStory(index){
+  slides.forEach(s=>s.classList.remove("active"));
+  slides[index].classList.add("active");
+  progressBars.forEach(bar=>bar.style.width="0%");
+  animateProgress(index);
+  clearTimeout(timer);
+  timer=setTimeout(nextSlide,duration);
+}
+
+function animateProgress(index){
+  let width=0;
+  let interval=setInterval(()=>{
+    width+=1;
+    progressBars[index].style.width=width+"%";
+    if(width>=100) clearInterval(interval);
+  },duration/100);
+}
+
+function nextSlide(){
+  current++;
+  if(current>=slides.length) current=0;
+  startStory(current);
+}
+
+function prevSlide(){
+  current--;
+  if(current<0) current=slides.length-1;
+  startStory(current);
+}
+
+document.querySelector(".tap-right").onclick=nextSlide;
+document.querySelector(".tap-left").onclick=prevSlide;
+
+function toggleAudio(){
+  if(music.paused) music.play();
+  else music.pause();
+}
+
+/* Auto-play music on first tap anywhere */
+let audioPlayed = false;
+document.querySelector(".story-container").addEventListener("click", ()=>{
+  if(!audioPlayed){
+    music.play().catch(e=>console.log("Audio play blocked:", e));
+    audioPlayed = true;
+  }
+});
+
+startStory(current);
+
+/* Floating hearts */
+let heartsContainer=document.getElementById("hearts");
+for(let i=0;i<25;i++){
+  let heart=document.createElement("span");
+  heart.innerHTML="❤️";
+  heart.style.left=Math.random()*100+"%";
+  heart.style.animationDuration=(5+Math.random()*10)+"s";
+  heart.style.fontSize=(15+Math.random()*25)+"px";
+  heartsContainer.appendChild(heart);
+}
+</script>
+</body>
+</html>
